@@ -5,47 +5,14 @@ from agnpy.utils.conversion import nu_to_epsilon_prime, B_to_cgs, lambda_c
 from agnpy.utils.math import axes_reshaper, gamma_to_integrate
 from numba import float64, jit, vectorize
 
-__all__ = ["fun_evaluate_sed_flux_jit", "SynchrotronJit"]
+__all__ = ["SynchrotronJit"]
 
 e = e.gauss
-
-def fun_evaluate_sed_flux_jit(
-    nu,
-    z,
-    d_L,
-    delta_D,
-    B,
-    R_b,
-    n_e,
-    *args,
-    ssa=False,
-    integrator=np.trapz,
-    gamma=gamma_to_integrate,
-):
-    # conversions
-    epsilon = nu_to_epsilon_prime(nu, z, delta_D)
-    B_cgs = B_to_cgs(B)
-    # reshape for multidimensional integration
-    _gamma, _epsilon = axes_reshaper(gamma, epsilon)
-    V_b = 4 / 3 * np.pi * np.power(R_b, 3)
-    N_e = V_b * n_e.evaluate(_gamma, *args)
-    # fold the electron distribution with the synchrotron power
-    # integrand = N_e * single_electron_synch_power
-    x = np.float64(calc_x(B_cgs, _epsilon, _gamma))
-    integrand=fun_to_integrand(x, B_cgs, _epsilon, _gamma, N_e)
-    #print(integrand*(u.Fr**3*u.g**0.5)/(u.cm**0.5*u.J*u.s**2))
-    integrand *= (u.Fr**3*u.g**0.5)/(u.cm**0.5*u.J*u.s**2)
-    emissivity = integrator(integrand, gamma, axis=0)
-    prefactor = np.power(delta_D, 4) / (4 * np.pi * np.power(d_L, 2))
-    sed = (prefactor * epsilon * emissivity).to("erg cm-2 s-1")
-
-    return sed
 
 @jit(nopython=True)
 def fun_to_integrand(x, B_cgs, epsilon, gamma, N_e):
     P = single_electron_synch_power_x_jit(x, B_cgs, epsilon, gamma)
     return N_e*P
-
 
 def calc_x(B_cgs, epsilon, gamma):
     """ratio of the frequency to the critical synchrotron frequency from
@@ -60,7 +27,6 @@ def calc_x(B_cgs, epsilon, gamma):
         / (3 * e * B_cgs * h * np.power(gamma, 2))
     )
     return x.to_value("")
-
 
 @jit(nopython=True)
 def single_electron_synch_power_x_jit(x, B_cgs, epsilon, gamma):
@@ -94,6 +60,7 @@ def tau_to_attenuation(tau):
     Eq. 7.122 in [DermerMenon2009]_."""
     u = 1 / 2 + np.exp(-tau) / tau - (1 - np.exp(-tau)) / np.power(tau, 2)
     return np.where(tau < 1e-3, 1, 3 * u / tau)
+
 
 class SynchrotronJit:
     """Class for synchrotron radiation computation
@@ -150,7 +117,7 @@ class SynchrotronJit:
         return (2 * k_epsilon * R_b).to_value("")
 
     @staticmethod
-    def evaluate_sed_flux_jit(
+    def evaluate_sed_flux(
         nu,
         z,
         d_L,

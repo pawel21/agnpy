@@ -92,7 +92,7 @@ class SynchrotronSelfComptonJit:
         epsilon = nu_to_epsilon_prime(nu_to_integrate, z, delta_D)
         # frequencies of the final sed
         epsilon_s = nu_to_epsilon_prime(nu, z, delta_D)
-        sed_synch = SynchrotronJit.evaluate_sed_flux_jit(
+        sed_synch = SynchrotronJit.evaluate_sed_flux(
             nu_to_integrate,
             z,
             d_L,
