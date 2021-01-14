@@ -164,3 +164,20 @@ class SynchrotronJit:
             sed *= attenuation
 
         return sed
+
+    def sed_flux(self, nu):
+        r"""Evaluates the synchrotron flux SED for a Synchrotron object built
+        from a Blob."""
+        return self.evaluate_sed_flux(
+            nu,
+            self.blob.z,
+            self.blob.d_L,
+            self.blob.delta_D,
+            self.blob.B,
+            self.blob.R_b,
+            self.blob.n_e,
+            *self.blob.n_e.parameters,
+            ssa=self.ssa,
+            integrator=self.integrator,
+            gamma=self.blob.gamma,
+        )
