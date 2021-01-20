@@ -27,15 +27,12 @@ def profile(command, label):
     cProfile.run(command, f"Profile_{label}.prof")
     prof = pstats.Stats(f"Profile_{label}.prof")
     # prof.strip_dirs().sort_stats("time").print_stats(10)
-    prof.sort_stats('cumulative').print_stats(10)
+    prof.sort_stats('cumulative').print_stats(5)
 
 def timing(command, number):
     """function to time a given command, returns time in seconds"""
     return timeit.timeit(command, globals=globals(), number=number)
 
-def profile_using_lp():
-    synch.sed_flux(nu_syn)
-    synch_jit.sed_flux(nu_syn)
 
 # define the blob
 spectrum_norm = 1e48 * u.Unit("erg")
@@ -73,27 +70,20 @@ ssc_jit_sed_command = "ssc_jit.sed_flux(nu_ssc)"
 syn_sed_ssa_command = "synch_ssa.sed_flux(nu_syn)"
 ssc_ssa_sed_command = "ssc_ssa.sed_flux(nu_ssc)"
 
-#synch_jit.sed_flux(nu_syn)  # bypassvto get valid time, first time numba function take time
-#lprofiler = LineProfiler()
-#lprofiler.add_function(synch.evaluate_sed_flux)
-#lprofiler.add_function(synch_jit.evaluate_sed_flux)
-#lp_wrap = lprofiler(profile_using_lp)
-#lp_wrap()
-#lprofiler.print_stats()
 
 n = 100
 print("\nprofiling synchrotron sed computation:")
 profile(syn_sed_command, "syn_sed")
 time_syn = timing(syn_sed_command, n)
 time_syn /= n
-print(f"time: {time_syn:.2e} s")
+print(f"time synchrotron: {time_syn:.2e} s")
 
 n = 100
 print("\nprofiling synchrotron jit sed computation:")
 profile(syn_jit_sed_command, "syn_jit_sed")
 time_syn = timing(syn_jit_sed_command, n)
 time_syn /= n
-print(f"time: {time_syn:.2e} s")
+print(f"time synchrotron jit: {time_syn:.2e} s")
 
 n = 100
 print("\nprofiling synchrotron sed ssa computation:")
@@ -102,14 +92,14 @@ time_syn_ssa = timing(syn_sed_ssa_command, n)
 time_syn_ssa /= n
 print(f"time: {time_syn_ssa:.2e} s")
 
-n = 50
+n = 100
 print("\nprofiling synchrotron sed computation:")
 profile(ssc_sed_command, 'ssc_sed')
 time_ssc = timing(ssc_sed_command, n)
 time_ssc /= n
 print(f"time ssc: {time_ssc:.2e} s")
 
-n = 50
+n = 100
 print("\nprofiling synchrotron Jit sed computation:")
 profile(ssc_jit_sed_command, 'ssc__jit_sed')
 time_ssc_jit = timing(ssc_jit_sed_command, n)
