@@ -3,3 +3,4 @@ from .external_compton import *
 from .kernels import *
 from .kernels_jit import *
 from .synchrotron_self_compton_jit import *
+from .external_compton_jit import *

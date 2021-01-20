@@ -141,7 +141,6 @@ class SynchrotronJit:
         # integrand = N_e * single_electron_synch_power
         x = np.float64(calc_x(B_cgs, _epsilon, _gamma))
         integrand=fun_to_integrand(x, B_cgs, _epsilon, _gamma, N_e)
-        #print(integrand*(u.Fr**3*u.g**0.5)/(u.cm**0.5*u.J*u.s**2))
         integrand *= (u.Fr**3*u.g**0.5)/(u.cm**0.5*u.J*u.s**2)
         emissivity = integrator(integrand, gamma, axis=0)
         prefactor = np.power(delta_D, 4) / (4 * np.pi * np.power(d_L, 2))

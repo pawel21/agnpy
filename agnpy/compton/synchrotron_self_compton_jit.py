@@ -128,3 +128,20 @@ class SynchrotronSelfComptonJit:
         emissivity = 3 / 4 * c * sigma_T * np.power(epsilon_s, 2) * integral_epsilon
         prefactor = np.power(delta_D, 4) / (4 * np.pi * np.power(d_L, 2))
         return (prefactor * emissivity).to("erg cm-2 s-1")
+
+    def sed_flux(self, nu):
+        """Evaluates the SSC flux SED for a SynchrotronSelfComtpon
+        object built from a Blob."""
+        return self.evaluate_sed_flux(
+            nu,
+            self.blob.z,
+            self.blob.d_L,
+            self.blob.delta_D,
+            self.blob.B,
+            self.blob.R_b,
+            self.blob.n_e,
+            *self.blob.n_e.parameters,
+            ssa=self.ssa,
+            integrator=self.integrator,
+            gamma=self.blob.gamma,
+        )
