@@ -15,7 +15,7 @@ def F_c(q, gamma_e):
 
 
 def isotropic_kernel(gamma, epsilon, epsilon_s):
-    """Compton kernel for isotropic nonthermal electrons scattering photons of 
+    """Compton kernel for isotropic nonthermal electrons scattering photons of
     an isotropic external radiation field.
     Integrand of Eq. 6.74 in [DermerMenon2009]_.
     Parameters
@@ -34,7 +34,7 @@ def isotropic_kernel(gamma, epsilon, epsilon_s):
 
 
 def get_gamma_min(epsilon_s, epsilon, mu_s, mu, phi):
-    """minimum Lorentz factor for Compton integration, 
+    """minimum Lorentz factor for Compton integration,
     Eq. 29 in [Dermer2009]_, Eq. 38 in [Finke2016]_."""
     sqrt_term = np.sqrt(1 + 2 / (epsilon * epsilon_s * (1 - cos_psi(mu_s, mu, phi))))
     return epsilon_s / 2 * (1 + sqrt_term)
@@ -62,7 +62,7 @@ def compton_kernel(gamma, epsilon_s, epsilon, mu_s, mu, phi):
     y = 1 - epsilon_s / gamma
     y_1 = -(2 * epsilon_s) / (gamma * epsilon_bar * y)
     y_2 = np.power(epsilon_s, 2) / np.power(gamma * epsilon_bar * y, 2)
-    values = y + 1 / y + y_1 + y_2
+    y_total = y + 1 / y + y_1 + y_2
     gamma_min = get_gamma_min(epsilon_s, epsilon, mu_s, mu, phi)
-    values = np.where(gamma >= gamma_min, y + 1 / y + y_1 + y_2, 0)
+    values = np.where(gamma >= gamma_min, y_total, 0)
     return values
