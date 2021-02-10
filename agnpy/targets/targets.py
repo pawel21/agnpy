@@ -17,32 +17,128 @@ __all__ = [
 
 # dictionary with all the available spectral lines
 lines_dictionary = {
-    "Lyepsilon": {"lambda":  937.80 * u.Angstrom, "R_Hbeta_ratio": 2.7 , "L_Hbeta_ratio": 0.24},
-    "Lydelta":   {"lambda":  949.74 * u.Angstrom, "R_Hbeta_ratio": 2.8 , "L_Hbeta_ratio": 0.24},
-    "CIII":      {"lambda":  977.02 * u.Angstrom, "R_Hbeta_ratio": 0.83, "L_Hbeta_ratio": 0.60},
-    "NIII":      {"lambda":  990.69 * u.Angstrom, "R_Hbeta_ratio": 0.85, "L_Hbeta_ratio": 0.60},
-    "Lybeta":    {"lambda": 1025.72 * u.Angstrom, "R_Hbeta_ratio": 1.2 , "L_Hbeta_ratio": 1.1},
-    "OVI":       {"lambda": 1033.83 * u.Angstrom, "R_Hbeta_ratio": 1.2 , "L_Hbeta_ratio": 1.1},
-    "ArI":       {"lambda": 1066.66 * u.Angstrom, "R_Hbeta_ratio": 4.5 , "L_Hbeta_ratio": 0.094},
-    "Lyalpha":   {"lambda": 1215.67 * u.Angstrom, "R_Hbeta_ratio": 0.27, "L_Hbeta_ratio":12},
-    "OI":        {"lambda": 1304.35 * u.Angstrom, "R_Hbeta_ratio": 4.0 , "L_Hbeta_ratio": 0.23},
-    "SiII":      {"lambda": 1306.82 * u.Angstrom, "R_Hbeta_ratio": 4.0 , "L_Hbeta_ratio": 0.23},
-    "SiIV":      {"lambda": 1396.76 * u.Angstrom, "R_Hbeta_ratio": 0.83, "L_Hbeta_ratio": 1.0},
-    "OIV]":      {"lambda": 1402.06 * u.Angstrom, "R_Hbeta_ratio": 0.83, "L_Hbeta_ratio": 1.0},
-    "CIV":       {"lambda": 1549.06 * u.Angstrom, "R_Hbeta_ratio": 0.83, "L_Hbeta_ratio": 2.9},
-    "NIV":       {"lambda": 1718.55 * u.Angstrom, "R_Hbeta_ratio": 3.8 , "L_Hbeta_ratio": 0.30},
-    "AlII":      {"lambda": 1721.89 * u.Angstrom, "R_Hbeta_ratio": 3.8 , "L_Hbeta_ratio": 0.30},
-    "CIII]":     {"lambda": 1908.73 * u.Angstrom, "R_Hbeta_ratio": 0.46, "L_Hbeta_ratio": 1.8},
-    "[NeIV]":    {"lambda": 2423.83 * u.Angstrom, "R_Hbeta_ratio": 5.8 , "L_Hbeta_ratio": 0.051},
-    "MgII":      {"lambda": 2798.75 * u.Angstrom, "R_Hbeta_ratio": 0.45, "L_Hbeta_ratio": 1.7},
-    "HeI":       {"lambda": 3188.67 * u.Angstrom, "R_Hbeta_ratio": 4.3 , "L_Hbeta_ratio": 0.051},
-    "Hdelta":    {"lambda": 4102.89 * u.Angstrom, "R_Hbeta_ratio": 3.4 , "L_Hbeta_ratio": 0.12},
-    "Hgamma":    {"lambda": 4341.68 * u.Angstrom, "R_Hbeta_ratio": 3.2 , "L_Hbeta_ratio": 0.30},
-    "HeII":      {"lambda": 4687.02 * u.Angstrom, "R_Hbeta_ratio": 0.63, "L_Hbeta_ratio": 0.016},
-    "Hbeta":     {"lambda": 4862.68 * u.Angstrom, "R_Hbeta_ratio": 1.0 , "L_Hbeta_ratio": 1.0},
-    "[ClIII]":   {"lambda": 5539.43 * u.Angstrom, "R_Hbeta_ratio": 4.8 , "L_Hbeta_ratio": 0.039},
-    "HeI":       {"lambda": 5877.29 * u.Angstrom, "R_Hbeta_ratio": 0.39, "L_Hbeta_ratio": 0.092},
-    "Halpha":    {"lambda": 6564.61 * u.Angstrom, "R_Hbeta_ratio": 1.3 , "L_Hbeta_ratio": 3.6},
+    "Lyepsilon": {
+        "lambda": 937.80 * u.Angstrom,
+        "R_Hbeta_ratio": 2.7,
+        "L_Hbeta_ratio": 0.24,
+    },
+    "Lydelta": {
+        "lambda": 949.74 * u.Angstrom,
+        "R_Hbeta_ratio": 2.8,
+        "L_Hbeta_ratio": 0.24,
+    },
+    "CIII": {
+        "lambda": 977.02 * u.Angstrom,
+        "R_Hbeta_ratio": 0.83,
+        "L_Hbeta_ratio": 0.60,
+    },
+    "NIII": {
+        "lambda": 990.69 * u.Angstrom,
+        "R_Hbeta_ratio": 0.85,
+        "L_Hbeta_ratio": 0.60,
+    },
+    "Lybeta": {
+        "lambda": 1025.72 * u.Angstrom,
+        "R_Hbeta_ratio": 1.2,
+        "L_Hbeta_ratio": 1.1,
+    },
+    "OVI": {"lambda": 1033.83 * u.Angstrom, "R_Hbeta_ratio": 1.2, "L_Hbeta_ratio": 1.1},
+    "ArI": {
+        "lambda": 1066.66 * u.Angstrom,
+        "R_Hbeta_ratio": 4.5,
+        "L_Hbeta_ratio": 0.094,
+    },
+    "Lyalpha": {
+        "lambda": 1215.67 * u.Angstrom,
+        "R_Hbeta_ratio": 0.27,
+        "L_Hbeta_ratio": 12,
+    },
+    "OI": {"lambda": 1304.35 * u.Angstrom, "R_Hbeta_ratio": 4.0, "L_Hbeta_ratio": 0.23},
+    "SiII": {
+        "lambda": 1306.82 * u.Angstrom,
+        "R_Hbeta_ratio": 4.0,
+        "L_Hbeta_ratio": 0.23,
+    },
+    "SiIV": {
+        "lambda": 1396.76 * u.Angstrom,
+        "R_Hbeta_ratio": 0.83,
+        "L_Hbeta_ratio": 1.0,
+    },
+    "OIV]": {
+        "lambda": 1402.06 * u.Angstrom,
+        "R_Hbeta_ratio": 0.83,
+        "L_Hbeta_ratio": 1.0,
+    },
+    "CIV": {
+        "lambda": 1549.06 * u.Angstrom,
+        "R_Hbeta_ratio": 0.83,
+        "L_Hbeta_ratio": 2.9,
+    },
+    "NIV": {
+        "lambda": 1718.55 * u.Angstrom,
+        "R_Hbeta_ratio": 3.8,
+        "L_Hbeta_ratio": 0.30,
+    },
+    "AlII": {
+        "lambda": 1721.89 * u.Angstrom,
+        "R_Hbeta_ratio": 3.8,
+        "L_Hbeta_ratio": 0.30,
+    },
+    "CIII]": {
+        "lambda": 1908.73 * u.Angstrom,
+        "R_Hbeta_ratio": 0.46,
+        "L_Hbeta_ratio": 1.8,
+    },
+    "[NeIV]": {
+        "lambda": 2423.83 * u.Angstrom,
+        "R_Hbeta_ratio": 5.8,
+        "L_Hbeta_ratio": 0.051,
+    },
+    "MgII": {
+        "lambda": 2798.75 * u.Angstrom,
+        "R_Hbeta_ratio": 0.45,
+        "L_Hbeta_ratio": 1.7,
+    },
+    "HeI": {
+        "lambda": 3188.67 * u.Angstrom,
+        "R_Hbeta_ratio": 4.3,
+        "L_Hbeta_ratio": 0.051,
+    },
+    "Hdelta": {
+        "lambda": 4102.89 * u.Angstrom,
+        "R_Hbeta_ratio": 3.4,
+        "L_Hbeta_ratio": 0.12,
+    },
+    "Hgamma": {
+        "lambda": 4341.68 * u.Angstrom,
+        "R_Hbeta_ratio": 3.2,
+        "L_Hbeta_ratio": 0.30,
+    },
+    "HeII": {
+        "lambda": 4687.02 * u.Angstrom,
+        "R_Hbeta_ratio": 0.63,
+        "L_Hbeta_ratio": 0.016,
+    },
+    "Hbeta": {
+        "lambda": 4862.68 * u.Angstrom,
+        "R_Hbeta_ratio": 1.0,
+        "L_Hbeta_ratio": 1.0,
+    },
+    "[ClIII]": {
+        "lambda": 5539.43 * u.Angstrom,
+        "R_Hbeta_ratio": 4.8,
+        "L_Hbeta_ratio": 0.039,
+    },
+    "HeI": {
+        "lambda": 5877.29 * u.Angstrom,
+        "R_Hbeta_ratio": 0.39,
+        "L_Hbeta_ratio": 0.092,
+    },
+    "Halpha": {
+        "lambda": 6564.61 * u.Angstrom,
+        "R_Hbeta_ratio": 1.3,
+        "L_Hbeta_ratio": 3.6,
+    },
 }
 
 
@@ -163,15 +259,14 @@ class SSDisk:
         self.R_g = (G * self.M_BH / np.power(c, 2)).to("cm")
         if R_g_units:
             # check that numbers have been passed
-            R_in_unit_check = isinstance(R_in, int) or isinstance(R_in, float)
-            R_out_unit_check = isinstance(R_out, int) or isinstance(R_out, float)
-            if R_in_unit_check and R_out_unit_check:
-                self.R_in = R_in * self.R_g
-                self.R_out = R_out * self.R_g
-                self.R_in_tilde = R_in
-                self.R_out_tilde = R_out
-            else:
+            R_in_unit_check = isinstance(R_in, (int, float))
+            R_out_unit_check = isinstance(R_out, (int, float))
+            if not R_in_unit_check or not R_out_unit_check:
                 raise TypeError("R_in / R_out passed with units, int / float expected")
+            self.R_in = R_in * self.R_g
+            self.R_out = R_out * self.R_g
+            self.R_in_tilde = R_in
+            self.R_out_tilde = R_out
         else:
             # check that quantities have been passed
             R_in_unit_check = isinstance(R_in, u.Quantity)
@@ -224,7 +319,7 @@ class SSDisk:
         L_Edd = 1.26 * 1e46 * M_8 << u.Unit("erg s-1")
         l_Edd = (L_disk / L_Edd).to_value("")
         xi = np.power(l_Edd / (M_8 * eta), 1 / 4)
-        return 2.7e-4 * xi * np.power(R_tilde, -3 / 4)
+        return 2.7 * 1e-4 * xi * np.power(R_tilde, -3 / 4)
 
     @staticmethod
     def evaluate_epsilon_mu(L_disk, M_BH, eta, mu, r_tilde):
@@ -373,11 +468,10 @@ class SphericalShellBLR:
         self.name = "SphericalShellBLR"
         self.L_disk = L_disk
         self.xi_line = xi_line
-        if line in lines_dictionary:
-            self.line = line
-            self.lambda_line = lines_dictionary[line]["lambda"]
-        else:
+        if line not in lines_dictionary:
             raise NameError(f"{line} not available in the line dictionary")
+        self.line = line
+        self.lambda_line = lines_dictionary[line]["lambda"]
         self.epsilon_line = (
             self.lambda_line.to("erg", equivalencies=u.spectral()) / mec2
         ).to_value("")
