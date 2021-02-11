@@ -9,7 +9,7 @@ from ..utils.math import (
     mu_to_integrate,
     phi_to_integrate,
 )
-from ..utils.conversion import nu_to_epsilon_prime, r_to_R_g_units
+from ..utils.conversion import nu_to_epsilon_prime
 from ..utils.geometry import x_re_shell, mu_star_shell, x_re_ring
 from ..targets import (
     CMB,
