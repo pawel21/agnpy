@@ -624,3 +624,34 @@ class RingDustTorus:
             mu = (r / x).to_value("")
             integral *= np.power(blob.Gamma * (1 - blob.Beta * mu), 2)
         return integral.to("erg cm-3")
+
+class BLRs:
+    """Broad Line Regions.
+    Each lines is emitted from an infinitesimally thin spherical shell.
+
+    Parameters
+    ----------
+    list_lines : list
+        list type of lines emitted
+    L_disk : :class:`~astropy.units.Quantity`
+        Luminosity of the disk whose radiation is being reprocessed by the BLR
+    xi_line : float
+        fraction of the disk radiation reprocessed by the BLR
+    R_line : :class:`~astropy.units.Quantity`
+        radius of the BLR spherical shell
+    """
+
+    def __init__(self, list_lines, L_disk, xi_line, R_line):
+        self.name = "BLRs"
+        self.L_disk = L_disk
+        self.xi_line = xi_line
+        for line in list_lines:
+            if line not in lines_dictionary:
+                raise NameError(f"{line} not available in the line dictionary")
+
+            self.line = line
+            self.lambda_line = lines_dictionary[line]["lambda"]
+            self.epsilon_line = (
+                self.lambda_line.to("erg", equivalencies=u.spectral()) / mec2
+                ).to_value("")
+        self.R_line = R_line
