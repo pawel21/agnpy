@@ -15,6 +15,7 @@ __all__ = [
     "PointSourceBehindJet",
     "SphericalShellBLR",
     "RingDustTorus",
+    "BLRs"
 ]
 
 
@@ -641,17 +642,18 @@ class BLRs:
         radius of the BLR spherical shell
     """
 
-    def __init__(self, list_lines, L_disk, xi_line, R_line):
+    def __init__(self, list_lines, L_Hbeta, xi_line, R_Hbeta):
         self.name = "BLRs"
-        self.L_disk = L_disk
+        self.L_Hbeta = L_Hbeta
         self.xi_line = xi_line
         for line in list_lines:
             if line not in lines_dictionary:
                 raise NameError(f"{line} not available in the line dictionary")
+        self.R_Hbeta = R_Hbeta
 
-            self.line = line
-            self.lambda_line = lines_dictionary[line]["lambda"]
-            self.epsilon_line = (
-                self.lambda_line.to("erg", equivalencies=u.spectral()) / mec2
-                ).to_value("")
-        self.R_line = R_line
+    def print_lines_info():
+        r"""Print the information of the available spectral lines.
+        Print radius and luminosity of lines base on Hbeta Line ratio.
+        """
+        for line in lines_dictionary.keys():
+            print(f"{line}: {lines_dictionary[line]}")
