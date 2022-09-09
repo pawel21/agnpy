@@ -461,6 +461,28 @@ class Absorption:
             phi=self.phi,
         )
 
+    def tau_blrs(self, nu):
+        "L norm to Hbeta "
+        for i, line in enumerate(self.target.list_lines):
+            print(i, line)
+            print(self.target.xi_line_list[i])
+            print(self.target.epsilon_line_list[i])
+            print(self.target.R_line_list[i])
+            tau = self.evaluate_tau_blr(
+                nu,
+                self.z,
+                self.mu_s,
+                self.target.L_Hbeta,
+                self.target.xi_line_list[i],
+                self.target.epsilon_line_list[i],
+                self.target.R_line_list[i],
+                self.r,
+                l_size=self.l_size,
+                mu=self.mu,
+                phi=self.phi,
+            )
+
+
     def tau_blr_mu_s(self, nu):
         """Evaluates the gamma-gamma absorption produced by a spherical shell
         BLR for a general set of model parameters and arbitrary mu_s

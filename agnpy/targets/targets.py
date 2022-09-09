@@ -656,16 +656,41 @@ class BLRs:
 
     def __init__(self, list_lines, L_Hbeta, xi_line, R_Hbeta):
         self.name = "BLRs"
+        self.list_lines = list_lines
         self.L_Hbeta = L_Hbeta
         self.xi_line = xi_line
         for line in list_lines:
             if line not in lines_dictionary:
                 raise NameError(f"{line} not available in the line dictionary")
+
         self.R_Hbeta = R_Hbeta
 
+        self.xi_line_list = []
+        self.R_line_list = []
+        self.epsilon_line_list = []
+        self.create_list_lines()
+
+
+    @staticmethod
     def print_lines_info():
         r"""Print the information of the available spectral lines.
         Print radius and luminosity of lines base on Hbeta Line ratio.
         """
         for line in lines_dictionary.keys():
             print(f"{line}: {lines_dictionary[line]}")
+
+    def create_list_lines(self):
+        for line in self.list_lines:
+            print(line)
+            xi_line_this=lines_dictionary[line]['L_Hbeta_ratio']
+            xi_line = (xi_line_this*self.xi_line)/30.652
+            self.xi_line_list.append(xi_line)
+
+            R_line_this=self.R_Hbeta*lines_dictionary[line]['R_Hbeta_ratio']
+            self.R_line_list.append(R_line_this)
+
+            lambda_line = lines_dictionary[line]["lambda"]
+            epsilon_line = (
+                lambda_line.to("erg", equivalencies=u.spectral()) / mec2
+                ).to_value("")
+            self.epsilon_line_list.append(epsilon_line)
