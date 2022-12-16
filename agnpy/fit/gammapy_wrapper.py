@@ -8,13 +8,12 @@ from gammapy.modeling.models import SpectralModel
 from ..utils.conversion import mec2
 from ..synchrotron import Synchrotron
 from ..compton import SynchrotronSelfCompton, ExternalCompton
-from ..targets import SSDisk, RingDustTorus
+from ..targets import SSDisk, RingDustTorus, lines_dictionary
 from .core import (
     get_spectral_parameters_from_n_e,
     make_emission_region_parameters_dict,
     make_targets_parameters_dict,
 )
-
 
 gamma_size = 300
 gamma_to_integrate = np.logspace(1, 9, gamma_size)
@@ -359,6 +358,196 @@ class ExternalComptonSpectralModel(SpectralModel):
                 nu, z, xi_dt * L_disk, T_dt, R_dt, d_L
             )
             sed += sed_bb_dt
+
+        # eventual reshaping
+        # we can do here something like
+        # sed = sed.reshape(energy.shape)
+        # see the same comment in the SSC model
+
+        return (sed / energy ** 2).to("1 / (cm2 eV s)")
+
+
+class ExternalComptonBLRsSpectralModel(SpectralModel):
+
+    tag = ["ExternalComptonBLRsSpectralModel"]
+
+    def __init__(self, n_e, targets, ssa=False):
+        """Gammapy wrapper for a source emitting Synchrotron, SSC, and EC on a
+        list of targets.
+
+        Parameters
+        ----------
+        n_e : `~agnpy.spectra.ParticleDistribution`
+            electron distribution to be used for this modelling
+        targets : list of strings ["blr", "dt"]
+            targets to be considered for external Compton
+            typically we consider the BLR or the DT or both, the EC on disk
+            is not considered as it is subdominant at distances >> R_out
+        ssa : bool
+            whether or not to calculate synchrotron self-absorption
+
+        Returns
+        -------
+        `~gammapy.modeling.models.SpectralModel`
+        """
+
+        self._n_e = n_e
+        self.targets = targets
+        self.ssa = ssa
+
+        # parameters of the particles energy distribution
+        spectral_pars = get_spectral_parameters_from_n_e(self._n_e, backend="gammapy")
+        self._spectral_pars_names = list(spectral_pars.keys())
+
+        # parameters of the emission region
+        emission_region_pars = make_emission_region_parameters_dict(
+            "ec", backend="gammapy"
+        )
+        self._emission_region_pars_names = list(emission_region_pars.keys())
+
+        # parameters of the targets
+        targets_pars = make_targets_parameters_dict(self.targets, backend="gammapy")
+        self._targets_pars_names = list(targets_pars.keys())
+
+        # group the model parameters, add the norm at the bottom of the list
+        norm = Parameter("norm", 1, min=0.1, max=10, is_norm=True, frozen=True)
+        self.default_parameters = Parameters(
+            [
+                *spectral_pars.values(),
+                *emission_region_pars.values(),
+                *targets_pars.values(),
+                norm,
+            ]
+        )
+
+        super().__init__()
+
+    def set_emission_region_parameters_from_blob(self, blob, r):
+        """Set the parameter of the emission region from a Blob instance.
+        Since this is EC, remember to specify also the distance"""
+        self.parameters["z"].value = blob.z
+        self.parameters["delta_D"].value = blob.delta_D
+        self.parameters["log10_B"].value = np.log10(blob.B.to_value("G"))
+        self.parameters["t_var"].value = blob.t_var.to_value("s")
+        self.parameters["mu_s"].value = blob.mu_s
+        self.parameters["log10_r"].value = np.log10(r.to_value("cm"))
+
+    def set_targets_parameters_from_targets(self, disk, blr=None, dt=None):
+        """Set the parameter of the targets for EC from instances of `~agnpy.targets`."""
+        self.parameters["log10_L_disk"].value = np.log10(
+            disk.L_disk.to_value("erg s-1")
+        )
+        self.parameters["M_BH"].value = disk.M_BH.to_value("g")
+        self.parameters["m_dot"].value = disk.m_dot.to_value("g s-1")
+        self.parameters["R_in"].value = disk.R_in.to_value("cm")
+        self.parameters["R_out"].value = disk.R_out.to_value("cm")
+
+        if blr is not None:
+            self.parameters["xi_line"].value = blr.xi_line
+            self.parameters["lambda_line"].value = blr.lambda_line.to_value("Angstrom")
+            self.parameters["R_line"].value = blr.R_line.to_value("cm")
+
+        if dt is not None:
+            self.parameters["xi_dt"].value = dt.xi_dt
+            self.parameters["T_dt"].value = dt.T_dt.to_value("K")
+            self.parameters["R_dt"].value = dt.R_dt.to_value("cm")
+
+    @property
+    def spectral_parameters(self):
+        """Select all the parameters related to the particle distribution."""
+        return self.parameters.select(self._spectral_pars_names)
+
+    @property
+    def emission_region_parameters(self):
+        """Select all the parameters related to the emission region."""
+        return self.parameters.select(self._emission_region_pars_names)
+
+    @property
+    def targets_parameters(self):
+        """Select all the parameters related to the targets for EC."""
+        return self.parameters.select(self._targets_pars_names)
+
+    def evaluate(self, energy, **kwargs):
+        """Evaluate the SED model.
+        NOTE: All the model parameters will be passed as kwargs by
+        SpectralModel.evaluate()."""
+
+        nu = energy.to("Hz", equivalencies=u.spectral())
+
+        args = _sort_spectral_parameters(self._spectral_pars_names, **kwargs)
+        z, d_L, delta_D, B, R_b, mu_s, r = _sort_emission_region_parameters(
+            "ec", **kwargs
+        )
+    
+        # evaluate the synch. and SSC SEDs
+        sed_synch = Synchrotron.evaluate_sed_flux(
+            nu, z, d_L, delta_D, B, R_b, self._n_e, *args, ssa=self.ssa
+        )
+        sed_ssc = SynchrotronSelfCompton.evaluate_sed_flux(
+            nu, z, d_L, delta_D, B, R_b, self._n_e, *args, ssa=self.ssa
+        )
+        sed = sed_synch + sed_ssc
+
+        # add the disk thermal components
+        L_disk, M_BH, m_dot, R_in, R_out = _sort_disk_parameters(**kwargs)
+        #sed_bb_disk = SSDisk.evaluate_multi_T_bb_norm_sed(
+        #    nu, z, L_disk, M_BH, m_dot, R_in, R_out, d_L
+        #)
+        #sed += sed_bb_disk
+
+        # add the EC components
+        if "blr" in self.targets:     
+            xi_line, epsilon_line, R_line = _sort_blr_parameters(**kwargs)       
+            for line in lines_dictionary: 
+                #  ['Lyalpha', 'Hbeta', 'Lyepsilon']:
+                xi_line_now=lines_dictionary[line]['L_Hbeta_ratio']
+                xi_line_this = (xi_line_now*xi_line)/30.652 #13.24
+                R_line_this=R_line*lines_dictionary[line]['R_Hbeta_ratio']
+                lambda_line = lines_dictionary[line]["lambda"]
+                epsilon_line = lambda_line.to("erg", equivalencies=u.spectral()) / mec2
+                sed_ec_blr = ExternalCompton.evaluate_sed_flux_blr(
+                    nu,
+                    z,
+                    d_L,
+                    delta_D,
+                    mu_s,
+                    R_b,
+                    L_disk,
+                    xi_line_this,
+                    epsilon_line,
+                    R_line_this,
+                    r,
+                    self._n_e,
+                    *args,
+                    gamma=gamma_to_integrate
+                )
+                sed += sed_ec_blr
+                
+
+        if "dt" in self.targets:
+            xi_dt, epsilon_dt, T_dt, R_dt = _sort_dt_parameters(**kwargs)
+            sed_ec_dt = ExternalCompton.evaluate_sed_flux_dt(
+                nu,
+                z,
+                d_L,
+                delta_D,
+                mu_s,
+                R_b,
+                L_disk,
+                xi_dt,
+                epsilon_dt,
+                R_dt,
+                r,
+                self._n_e,
+                *args,
+                gamma=gamma_to_integrate
+            )
+            sed += sed_ec_dt
+            # add the thermal emission of the DT as well
+            #sed_bb_dt = RingDustTorus.evaluate_bb_norm_sed(
+            #    nu, z, xi_dt * L_disk, T_dt, R_dt, d_L
+            #)
+            #sed += sed_bb_dt
 
         # eventual reshaping
         # we can do here something like

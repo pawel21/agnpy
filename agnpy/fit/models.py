@@ -1,6 +1,7 @@
 from .gammapy_wrapper import (
     SynchrotronSelfComptonSpectralModel,
     ExternalComptonSpectralModel,
+    ExternalComptonBLRsSpectralModel
 )
 from .sherpa_wrapper import (
     SynchrotronSelfComptonRegriddableModel1D,
@@ -30,6 +31,17 @@ class ExternalComptonModel:
             return ExternalComptonRegriddableModel1D(n_e, targets, ssa)
         elif backend == "gammapy":
             return ExternalComptonSpectralModel(n_e, targets, ssa)
+        else:
+            raise ValueError(
+                f"{backend} is not an available backend, try gammapy or sherpa"
+            )
+
+class ExternalComptonBLRsModel:
+    """Model for external Compton scenario."""
+
+    def __new__(cls, n_e, targets, ssa=False, backend="gammapy"):
+        if backend == "gammapy":
+            return ExternalComptonBLRsSpectralModel(n_e, targets, ssa)
         else:
             raise ValueError(
                 f"{backend} is not an available backend, try gammapy or sherpa"
